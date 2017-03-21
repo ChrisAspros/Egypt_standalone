@@ -1,6 +1,6 @@
 #include "ofMain.h"
 #include "ofApp.h"
-//branch 1
+//trying-to-fix-graphics branch
 //========================================================================
 int main( ){
 	ofSetupOpenGL(575,800, OF_WINDOW);			// <-------- setup the GL context

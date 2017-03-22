@@ -1,6 +1,5 @@
-//branch 3
 time_signature 4
-form_length 12
+form_length 32
 harmonic_rhythm 1 //each non-t production applies to 1 bar (e.g. I1 : 1, I2 : 2), i.e. seq_t[3]==1, seq_t[3]==2 etc.
 
 //spaces are significant

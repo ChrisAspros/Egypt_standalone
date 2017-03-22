@@ -56,7 +56,7 @@ void ofApp::update(){
         blues.ending = OSC._ending;
         blues.goal_reached = OSC._goal_reached;
         
-        //allowing to draw input indication
+        //allowing to draw P(rediction) E(ngine) input indication
         if (blues.ending){ show_p_e_input = 1; show_recovery = 1; }
         if (blues.goal_reached) show_p_e_input = 1;
         
@@ -106,7 +106,7 @@ void ofApp::draw(){
     ofSetColor(110);
     ofSetLineWidth(2.5);
     ofNoFill();
-    ofDrawRectangle(140, 60, 300, 170);
+    ofDrawRectangle(140, 40, 300, 120);
     
     string p_e_input; //input from prediction engine
     
@@ -135,11 +135,11 @@ void ofApp::draw(){
     
     //CYCLE STATE FRAME
     ofSetColor(255);
-    openSans.drawString("CYCLE STATE:", ofGetWidth()/2 - 80, 240);
+    openSans.drawString("CYCLE STATE:", ofGetWidth()/2 - 80, 190);
     ofSetColor(110);
     ofSetLineWidth(2.5);
     ofNoFill();
-    ofDrawRectangle(4, 250, 567, 500);
+    ofDrawRectangle(4, 200, 567, 540);
     
     
     //DRAW CYCLE STATES
@@ -170,23 +170,25 @@ void ofApp::draw(){
         }
          */
         
-        for (int j=0; j<i/4; j++) chord_str = "\n\n\n" + chord_str;
-        openSans.drawString(chord_str, ((i%4)+1)*135-95, 453);
+        for (int j=0; j<i/4; j++) chord_str = "\n\n" + chord_str;
+        openSans.drawString(chord_str, ((i%4)+1)*135-95, 240);
     }
     
     
-    //DRAW BARLINES
+    //DRAW A B A C as form indicators
     ofSetColor(102, 102, 0);
     string barline;
     
-    for (int i=0; i<15; i++){
+    for (int i=0; i<4; i++){
         
-        barline = "|";
+        //barline = "|";
         
-        if (i==0 || i==14) barline = "||";
+        if (i==0 || i==2) barline = "A";
+        else if (i==1) barline = "B";
+        else if (i==3) barline = "C";
         
-        for (int j=0; j<i/5; j++) barline = "\n\n\n" + barline;
-        openSans.drawString (barline, ((i%5)+1)*135-130, 450);
+        //for (int j=0; j<i/5; j++) barline = "\n\n" + barline;
+        openSans.drawString (barline, 10, 240+i*138);//, ((i%5)+1)*135-130, 240);
     }
     
     
@@ -197,10 +199,10 @@ void ofApp::draw(){
     //openSans.drawString(ofToString(blues.t[3]), 50, 50);
     
     ofPushMatrix();
-    ofTranslate(51, 390);
+    ofTranslate(49, 190);
     
-    for (int j=0; j<blues.t[3]/4; j++) ofTranslate(0, 105);
-    ofTranslate(((blues.t[3]%4))*133, 0);
+    for (int j=0; j<blues.t[3]/4; j++) ofTranslate(0, 69);//pushing down every 4 chords
+    ofTranslate(((blues.t[3]%4))*133, 0);//pushing right every chord
     
     arrow.draw();
     ofPopMatrix();

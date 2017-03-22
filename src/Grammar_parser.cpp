@@ -57,7 +57,7 @@ G_parser::G_parser() : grammar(grammar_path, std::ifstream::in){
     }
     
     //place decs for the 1st cycle
-    vector<int> t_aux = {0, 0, 0, 11, 0};
+    vector<int> t_aux = {0, 0, 0, form_length-1, 0};
     update_dec(t_aux);
     
     grammar.close();
@@ -680,7 +680,7 @@ void G_parser::update_finals(vector<int>& seq_t){
      //*/
     
     ///*===============
-    if (seq_t[3]==11 && cadenced) {//if (!goal_reached && seq_t[3]==11 && cadenced)
+    if (seq_t[3]==form_length-1 && cadenced) {//if (!goal_reached && seq_t[3]==11 && cadenced)
         //cout << "finals_1" << endl;
         for (int i=cad_pos+1; i<curr_cycle.size() - 1; i++) curr_cycle[i].name = "fin";
         //curr_cycle[11].name = "V";

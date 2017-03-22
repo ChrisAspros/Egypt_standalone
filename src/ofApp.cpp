@@ -14,7 +14,7 @@ void ofApp::setup(){
     //sleep(5);
     //ofSleepMillis(1000);//seems to make it a bit more stable?
     
-    ofSetFrameRate(60); // 1 frame : 1 tick
+    ofSetFrameRate(60); // for blues was 60 // 1 frame : 1 tick
     //ofSetFrameRate(70);
     //seq.setup();
     blues.setup();
@@ -182,7 +182,6 @@ void ofApp::draw(){
     for (int i=0; i<4; i++){
         
         //barline = "|";
-        
         if (i==0 || i==2) barline = "A";
         else if (i==1) barline = "B";
         else if (i==3) barline = "C";

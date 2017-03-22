@@ -11,9 +11,11 @@
 
 #include <stdio.h>
 #include "ofxMidiOut.h"
+#include "Grammar_parser.h"
 //#include "ofxMidi.h" //??
 
 //class Blues_structure;
+class Grammar_parser;
 
 class Sequencer{
     
@@ -69,6 +71,8 @@ public:
     //vector<int> v_place;
     
     //int ar[];
+    
+    G_parser parser;
 };
 
 #endif /* defined(____Sequencer__) */

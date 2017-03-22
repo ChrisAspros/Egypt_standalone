@@ -164,7 +164,7 @@ void Blues_structure::play_drums_normal(){
     
     //BASS DRUM
     notes_v = {drum_notes[0]};
-    for (int i=0; i<11; i++) multiple_bars.push_back(i);
+    for (int i=0; i<parser.form_length-1; i++) multiple_bars.push_back(i);
     
     for (int i=0; i<multiple_bars.size(); i++){
     
@@ -178,10 +178,10 @@ void Blues_structure::play_drums_normal(){
         seq.time_placement(t, notes_v, pos_drums, QN_dur, ch_drums);
     }
     
-    //bar 12
-    for (int i=0; i<12; i+=2){
+    //bar 12 XXX LAST BAR??
+    for (int i=0; i<parser.form_length; i+=2){
     
-        pos_drums = {0, i%3, i/3, 11};
+        pos_drums = {0, i%3, i/3, parser.form_length-1};
         seq.time_placement(t, notes_v, pos_drums, QN_dur, ch_drums);
     }
 
@@ -189,7 +189,7 @@ void Blues_structure::play_drums_normal(){
     notes_v = {drum_notes[1]};//{drum_notes[0]};
     //for (int i=0; i<11; i++) multiple_bars.push_back(i);
     
-    for (int i=0; i<11; i++){
+    for (int i=0; i<parser.form_length-1; i++){
     
         pos_drums = {0, 0, 1, i};
         seq.time_placement(t, notes_v, pos_drums, QN_dur, ch_drums);
@@ -224,7 +224,7 @@ void Blues_structure::play_drums_normal(){
     //bar 12
     for (int i=0; i<3; i++){
     
-        pos_drums = {0, i, 0, 11};
+        pos_drums = {0, i, 0, parser.form_length-1};
         seq.time_placement(t, notes_v, pos_drums, QN_dur, ch_drums);
     }
      
@@ -263,21 +263,21 @@ void Blues_structure::play_drums_normal(){
     notes_v = {drum_notes[4]};
     for (int i=0; i<3; i++){
 
-        pos_drums = {0, i, 1, 11};
+        pos_drums = {0, i, 1, parser.form_length-1};
         seq.time_placement(t, notes_v, pos_drums, QN_dur, ch_drums);
     }
     
     notes_v = {drum_notes[3]};
     for (int i=0; i<3; i++){
         
-        pos_drums = {0, i, 2, 11};
+        pos_drums = {0, i, 2, parser.form_length-1};
         seq.time_placement(t, notes_v, pos_drums, QN_dur, ch_drums);
     }
     
     notes_v = {drum_notes[2]};
     for (int i=0; i<3; i++){
         
-        pos_drums = {0, i, 3, 11};
+        pos_drums = {0, i, 3, parser.form_length-1};
         seq.time_placement(t, notes_v, pos_drums, QN_dur, ch_drums);
     }
 
@@ -295,7 +295,7 @@ void Blues_structure::play_drums_cad(){
     //BASS DRUM
     notes_v = {drum_notes[0]};
     //bar 12
-    for (int i=0; i<12; i+=2){
+    for (int i=0; i<parser.form_length; i+=2){
         
         pos_drums = {0, i%3, i/3, cad_t[3]+1};
         seq.time_placement(t, notes_v, pos_drums, QN_dur, ch_drums);
@@ -338,7 +338,7 @@ void Blues_structure::play_drums_cad(){
     
     //CRASH
     notes_v = {drum_notes[7]};//{drum_notes[drum_notes.size()-1]};
-    pos_drums = {0, 0, 0, (cad_t[3]+1)%12};
+    pos_drums = {0, 0, 0, (cad_t[3]+1)%parser.form_length};
     seq.time_placement(t, notes_v, pos_drums, QN_dur, ch_drums);
 }
 
@@ -504,17 +504,17 @@ vector<int> Blues_structure::get_chord(int root_pitch, int type, int invert, boo
     for (int i=0; i<invert; i++){
         int first_elem = chord_set[0];
         chord_set.erase(chord_set.begin());
-        chord_set.push_back(first_elem + 12);
+        chord_set.push_back(first_elem + parser.form_length);
     }
     
     //3rd inversion 1 octave lower (better register)
     if (invert == 2 || invert == 3){
         for (int i=0; i<chord_set.size(); i++){
-            chord_set[i] -= 12;
+            chord_set[i] -= parser.form_length;
         }
     }
     
-    if (position) chord_set[1] += 12;
+    if (position) chord_set[1] += parser.form_length;
     
     //make chord pitches
     vector<int> chord;

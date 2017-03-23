@@ -56,6 +56,7 @@ public:
         vector<string> right_str;
         float prob;
     };
+    
     struct rule{
         vector<string> left_str;
         vector<right_s> right_side;
@@ -104,7 +105,7 @@ public:
     
     vector<elem_ID> curr_cycle;
     void update_cycle(vector<elem_ID>& production, rule& r, vector<int>& seq_t);//size() = [form_length * harmonic_rhythm]
-    void update_dec(vector<int>& seq_t);
+    void start_cycle(vector<int>& seq_t);
     void update_ending(vector<int>& seq_t);
     void update_cad(vector<int>& seq_t);
     void recover(vector<int>& seq_t);

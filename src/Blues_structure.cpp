@@ -93,7 +93,7 @@ void Blues_structure::update(){
     }
     else
     */
-    if (parser.stop_seq){//finishing && goal_reached && last_chord){
+    if (parser.stop_seq){//finishing && goal_reached && last_chord)
     
         stopping = true;
         if (fin_t.size()==0) fin_t = t;//keeping constant value

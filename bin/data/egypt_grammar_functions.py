@@ -3,7 +3,7 @@ form_length 16
 harmonic_rhythm 1 //each non-t production applies to 1 bar (e.g. I1 : 1, I2 : 2), i.e. seq_t[3]==1, seq_t[3]==2 etc.
 
 //spaces are significant
-//decision_bars { 1 5 9 11 13 15 17 21 25 27 29 31 } //for now
+//decision_bars { 1 5 9 11 13 15 17 21 25 27 29 31 } //for recovery? (if e.g. in middle of the form)
 //decision_bars { 1 9 17 25 }
 decision_bars { 1 9 }
 cadence_bars { 3 7 11 15 19 23 27 31 } //no need for 11 as it is the form's' end, but just to make it more 'cadency' (see cad_11)
@@ -52,7 +52,7 @@ rule: Sect_9 -> 1.0 dec 2 dec 2 dec 2 dec 2
 
 //DURATIONS IN PARENTHESES
 
-rule: S -> 1.0 SectA(8) SectB(8) //SectA(8) SectC(8) //They have to be vector<elem_ID> + is type_ID struct used? (in Grammar_parser.h)
+rule: S -> 1.0 SectA(1) SectB(9) //SectA(8) SectC(8) //They have to be vector<elem_ID>
 		:end_rule
 
 rule: SectA -> 1.0 dec(1) dec(5)
@@ -84,27 +84,10 @@ rule: dec_9 -> 0.4 IV IV
 			-> 0.2 IV IIIo
 	  		:end_rule
 
-//if it doesnt work only keep the context-insensitive rule just underneath
-rule: i dec_11 i -> 0.6 i IV IV
-				 -> 0.4 i IV Vo
-				:end_rule
-rule: ivm dec_11 i -> 0.6 ivm IV I
-				   -> 0.4 ivm IV Vo
-				  :end_rule
 
-rule: dec_11 -> 0.6 IV I
-			 -> 0.3 IV Vo
-			 -> 0.1 IV IV
-			:end_rule
 
-rule: dec_13 -> 0.6 IV I
-			 -> 0.4 IV IV
-			:end_rule
-
-rule: dec_15 -> 0.1 bVII I
-			 -> 0.3 bVII bII
-			 -> 0.2 bVII Vo
-			 -> 0.4 bVII bVII
+rule: dec_13 -> 0.6 IV I bVII I
+			 -> 0.4 IV IV bVII I
 			:end_rule
 
 

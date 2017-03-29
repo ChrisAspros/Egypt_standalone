@@ -47,11 +47,6 @@ public:
     int rule_pop = 0;
     //int leftmost_time;
     
-    int aux = 0;
-    
-    void store_opt_data(string& nc);
-    void store_options(string& nc);
-    
     struct right_s{
         vector<string> right_str;
         float prob;
@@ -62,7 +57,9 @@ public:
         vector<right_s> right_side;
         vector<int> leftmost_time;//{beat, bar}
         
-        bool timed;
+        bool timed;//re: left side of rule "dec_1"
+        bool timed_production;//re: right side of rule "SectA(9)"
+        vector<int> prod_times;//production times of right elements (if timed)
         
         //optional elements
         bool is_optional;
@@ -75,7 +72,11 @@ public:
     map<vector<int>, vector<rule>> timed_rules;//specified rule: labels timed rules (t vector)
     vector<rule> general_rules;//store non-timed rules
     
-    string exclude_time(string& s_t_r);
+    void store_opt_data(string& nc);
+    void store_options(string& nc);
+    void store_prod_times(string& nc, rule& r);
+    
+    string exclude_times(string& s_t_r);
     
     void print_rules();
     

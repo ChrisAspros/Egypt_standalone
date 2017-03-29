@@ -72,6 +72,7 @@ void G_parser::store_rules(string& nc){
         //cout << "rules: entered and harn_rh==" << harm_rh << " and form_length==" << form_length << endl;
         all_rules.push_back(rule());
         all_rules[rule_pop].is_optional = false;
+        all_rules[rule_pop].timed_production = false;
         
         nc = get_nc();
         
@@ -79,6 +80,7 @@ void G_parser::store_rules(string& nc){
         while(nc!="->"){
             all_rules[rule_pop].left_str.push_back(nc);
             store_opt_data(nc);
+            store_prod_times(nc, all_rules[rule_pop]);
             nc = get_nc();
         }
         
@@ -139,7 +141,7 @@ void G_parser::store_rules(string& nc){
                     all_rules[rule_pop].leftmost_time =  {rule_time[0], rule_time[1] - (i / harm_rh)};
                     
                     //exclude "_*..", i.e. stores "I" in rule instead of "I_2" (plus time info of course)
-                    all_rules[rule_pop].left_str[i] = exclude_time(all_rules[rule_pop].left_str[i]);
+                    all_rules[rule_pop].left_str[i] = exclude_times(all_rules[rule_pop].left_str[i]);
                     
                     //existing_rules.push_back();
                     break;
@@ -216,18 +218,42 @@ void G_parser::store_options(string& nc){
 }
 
 
-string G_parser::exclude_time(string& s_t_r){
+void G_parser::store_prod_times(string& nc, rule& r){
+    
+    for(int i=0; i<nc.length(); i++){
+        
+        if (nc[i]=='('){
+            all_rules[rule_pop].timed_production = true;
+            
+            //store production times
+            string prod_t_str;
+            i++;
+            while (nc[i]!=')'){
+                
+                prod_t_str.push_back(nc[i]);
+                i++;
+            }
+            int prod_t_int = atoi(prod_t_str.c_str());
+            r.prod_times.push_back(prod_t_int);
+            
+            //exclude '(*)'
+            //exclude_times(nc)//need to store the ELEM (or smth) in r.right_str?
+        }
+    }
+}
+
+
+string G_parser::exclude_times(string& s_t_r){//excludes '(8)' or '_*'
     
     string new_str;
     for(int i=0; i<s_t_r.length(); i++){
         
-        if (s_t_r[i] == '_') break;
+        if (s_t_r[i] == '_' || s_t_r[i] == '(') break;
         new_str.push_back(s_t_r[i]);
     }
     
     return new_str;
 }
-
 
 
 void G_parser::find_rule(vector<int>& seq_t){
@@ -465,16 +491,23 @@ void G_parser::rewrite(rule& r, vector<int>& seq_t){
     //produce from rule
     for (int i=0; i<r.right_side[choice].right_str.size(); i++){
         
-        production.push_back(elem_ID());
-        production[i].name = r.right_side[choice].right_str[i];
-        //else (generals.leftmost_time == {0 ,0})
-        
         vector<int> t_aux(2);//beat, bar
-        
         t_aux[0] = r.leftmost_time[0] % t_sign;//time signature
         t_aux[1] = ((r.leftmost_time[1]+i / harm_rh) + form_length) % form_length;
         
-        production[i].time = t_aux;
+        production.push_back(elem_ID());
+        if (r.timed_production){
+            
+            production[i].name = exclude_times(r.right_side[choice].right_str[i]);
+            production[i].time = {0, r.leftmost_time[1] + r.prod_times[i]};//{beat, bar} config. OK?
+        }
+        else {
+            
+            production[i].name = r.right_side[choice].right_str[i];
+            //else (generals.leftmost_time == {0 ,0})
+            
+            production[i].time = t_aux;
+        }
     }
     
     update_cycle(production, r, seq_t);

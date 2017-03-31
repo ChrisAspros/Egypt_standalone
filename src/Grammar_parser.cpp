@@ -79,8 +79,6 @@ void G_parser::store_rules(string& nc){
         //left side
         while(nc!="->"){
             all_rules[rule_pop].left_str.push_back(nc);
-            store_opt_data(nc);
-            store_prod_times(nc, all_rules[rule_pop]);
             nc = get_nc();
         }
         
@@ -92,6 +90,11 @@ void G_parser::store_rules(string& nc){
             nc = get_nc();//production probability
             all_rules[rule_pop].right_side[prod_pop].prob = atof(nc.c_str());
             nc = get_nc();
+            
+            store_opt_data(nc);
+            store_prod_times(nc, all_rules[rule_pop]);
+            
+            //nc = get_nc();////NECESSARY??
             
             //store right_str
             while(nc!="->" && nc!=":end_rule"){
@@ -496,10 +499,11 @@ void G_parser::rewrite(rule& r, vector<int>& seq_t){
         t_aux[1] = ((r.leftmost_time[1]+i / harm_rh) + form_length) % form_length;
         
         production.push_back(elem_ID());
+        
         if (r.timed_production){
             
             production[i].name = exclude_times(r.right_side[choice].right_str[i]);
-            production[i].time = {0, r.leftmost_time[1] + r.prod_times[i]};//{beat, bar} config. OK?
+            production[i].time = {t_aux[0], r.leftmost_time[1] + r.prod_times[i]};//{beat, bar} config. OK?
         }
         else {
             
@@ -564,7 +568,7 @@ void G_parser::update_cycle(vector<elem_ID>& production, rule& r, vector<int>& s
         //i.e. if i does not exist in the r.opt_positions vector
     }
     
-    //at end of cycle (after last rewrite) place dec (or dec_* ??) at decision points
+    //at end of cycle (after last rewrite) place "S" at start.
     start_cycle(seq_t);
     
     update_ending(seq_t);//will overwrite start_cycle()

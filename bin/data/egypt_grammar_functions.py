@@ -1,5 +1,5 @@
 time_signature 4
-form_length 16
+form_length 8
 harmonic_rhythm 1 //each non-t production applies to 1 bar (e.g. I1 : 1, I2 : 2), i.e. seq_t[3]==1, seq_t[3]==2 etc.
 
 //spaces are significant
@@ -42,23 +42,24 @@ DOCUMENTATION
 
 //in the Sect_* rules, the _* simply indicates the placement for the human reader. 
 //The actual sect positions are set in the basic vectors above - get_basic_vectors() in the code
-rule: Sect_1 -> 1.0 dec 2 3 4 dec 2 3 4
+
+//rule: Sect_1 -> 1.0 dec 2 3 4 dec 2 3 4
 		:end_rule //no time-specific productions supported
 
-rule: Sect_9 -> 1.0 dec 2 dec 2 dec 2 dec 2
+//rule: Sect_9 -> 1.0 dec 2 dec 2 dec 2 dec 2
 		:end_rule
 
 //rule: DecΒ_9 -> 1.0 dec_9 dec_
 
 //DURATIONS IN PARENTHESES
 
-rule: S -> 1.0 SectA(1) SectB(9) //SectA(8) SectC(8) //They have to be vector<elem_ID>
+rule: S -> 1.0 SectA(0) //SectB(8) //SectA(8) SectC(8) //They have to be vector<elem_ID>
 		:end_rule
 
-rule: SectA -> 1.0 dec(1) dec(5)
+rule: SectA -> 1.0 dec(0) dec(4)
 			:end_rule
 
-rule: SectB -> 1.0 dec(1) dec(5) //bars 1 and 5 after SectB accordingly
+//rule: SectB -> 1.0 dec(1) dec(5) //bars 1 and 5 after SectB accordingly
 			:end_rule
 
 
@@ -78,7 +79,7 @@ rule: dec_5 -> 0.4 I I bVII I
 
 
 
-rule: dec_9 -> 0.4 IV IV
+//rule: dec_9 -> 0.4 IV IV
 			-> 0.1 IV I
 			-> 0.3 IV bVI
 			-> 0.2 IV IIIo
@@ -86,7 +87,7 @@ rule: dec_9 -> 0.4 IV IV
 
 
 
-rule: dec_13 -> 0.6 IV I bVII I
+//rule: dec_13 -> 0.6 IV I bVII I
 			 -> 0.4 IV IV bVII I
 			:end_rule
 

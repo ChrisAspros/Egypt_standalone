@@ -85,11 +85,6 @@ public:
         vector<int> time;//beat, bar (harm_rh next)
     };
     
-    struct type_ID{
-        string name;
-        vector<int> time;//corrsponding time in music form
-    };
-    
     void find_rule(vector<int>& seq_t);
     bool check_optional(rule& r, vector<int>& seq_t);
     bool is_terminal(vector<int>& seq_t);

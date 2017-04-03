@@ -1,13 +1,13 @@
 time_signature 4
-form_length 8
+form_length 16
 harmonic_rhythm 1 //each non-t production applies to 1 bar (e.g. I1 : 1, I2 : 2), i.e. seq_t[3]==1, seq_t[3]==2 etc.
 
 //spaces are significant
 //decision_bars { 1 5 9 11 13 15 17 21 25 27 29 31 } //for recovery? (if e.g. in middle of the form)
 //decision_bars { 1 9 17 25 }
-decision_bars { 1 9 }
-cadence_bars { 3 7 11 15 19 23 27 31 } //no need for 11 as it is the form's' end, but just to make it more 'cadency' (see cad_11)
-optimal_form { I I bVII I I bII bVII I IV IIIo IV I IV IV bVII bVII I I bVII I I bII bVII I bII I bVII I bII I bVII I }
+//decision_bars { 1 9 }
+//cadence_bars { 3 7 11 15 19 23 27 31 } //no need for 11 as it is the form's' end, but just to make it more 'cadency' (see cad_11)
+//optimal_form { I I bVII I I bII bVII I IV IIIo IV I IV IV bVII bVII I I bVII I I bII bVII I bII I bVII I bII I bVII I }
 terminals { i i6 i7 bii iim7 iiim iiim7 iiio iv iv6 iv7 ivm v7 vo bvi bviim }
 
 //decision_heads dec_* //apply to decision_bars elem
@@ -43,24 +43,23 @@ DOCUMENTATION
 //in the Sect_* rules, the _* simply indicates the placement for the human reader. 
 //The actual sect positions are set in the basic vectors above - get_basic_vectors() in the code
 
-//rule: Sect_1 -> 1.0 dec 2 3 4 dec 2 3 4
-		:end_rule //no time-specific productions supported
-
-//rule: Sect_9 -> 1.0 dec 2 dec 2 dec 2 dec 2
-		:end_rule
-
-//rule: DecΒ_9 -> 1.0 dec_9 dec_
 
 //DURATIONS IN PARENTHESES
 
-rule: S -> 1.0 SectA(0) //SectB(8) //SectA(8) SectC(8) //They have to be vector<elem_ID>
+//SectA / SectB topo8etountai anapoda sth forma: SectB SectA
+rule: S -> 1.0 SectA(0) SectB(8) //SectC(16) SectA(24) //SectB(2) //SectA(8) SectC(8) //
 		:end_rule
 
-rule: SectA -> 1.0 dec(0) dec(4)
+rule: SectA -> 1.0 dec(0) dec(4) //dec(0) dec(2)
 			:end_rule
 
-//rule: SectB -> 1.0 dec(1) dec(5) //bars 1 and 5 after SectB accordingly
+
+rule: SectB -> 1.0 dec(0) dec(4)
 			:end_rule
+
+
+rule: SectC -> 1.0 bII :end_rule
+
 
 
 rule: dec_1 -> 0.4 I I bVII I
@@ -77,17 +76,13 @@ rule: dec_5 -> 0.4 I I bVII I
 	  		-> 0.1 I bII Vo I
 	  		:end_rule
 
-
-
-//rule: dec_9 -> 0.4 IV IV
+rule: dec_9 -> 0.4 IV IV
 			-> 0.1 IV I
 			-> 0.3 IV bVI
 			-> 0.2 IV IIIo
 	  		:end_rule
 
-
-
-//rule: dec_13 -> 0.6 IV I bVII I
+rule: dec_13 -> 0.6 IV I bVII I
 			 -> 0.4 IV IV bVII I
 			:end_rule
 

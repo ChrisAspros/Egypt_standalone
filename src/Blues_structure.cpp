@@ -76,6 +76,8 @@ void Blues_structure::update(){
         parser.find_rule(t);
         string terminal = parser.return_terminal(t);
         chord = terminal_to_midi(terminal);
+        
+        parser.start_cycle(t);//HERE or in parser.update_cycle();
     }
     
     /*

@@ -91,14 +91,16 @@ void G_parser::store_rules(string& nc){
             all_rules[rule_pop].right_side[prod_pop].prob = atof(nc.c_str());
             nc = get_nc();
             
-            store_opt_data(nc);
-            store_prod_times(nc, all_rules[rule_pop]);
-            
             //nc = get_nc();////NECESSARY??
             
             //store right_str
             while(nc!="->" && nc!=":end_rule"){
                 all_rules[rule_pop].right_side[prod_pop].right_str.push_back(nc);//={"STR1", "STR2"};//
+                //nc = get_nc();
+                
+                store_opt_data(nc);
+                store_prod_times(nc, all_rules[rule_pop]);
+                
                 nc = get_nc();
             }
             
@@ -226,7 +228,7 @@ void G_parser::store_prod_times(string& nc, rule& r){
     for(int i=0; i<nc.length(); i++){
         
         if (nc[i]=='('){
-            all_rules[rule_pop].timed_production = true;
+            r.timed_production = true;
             
             //store production times
             string prod_t_str;
@@ -503,7 +505,7 @@ void G_parser::rewrite(rule& r, vector<int>& seq_t){
         if (r.timed_production){
             
             production[i].name = exclude_times(r.right_side[choice].right_str[i]);
-            production[i].time = {t_aux[0], r.leftmost_time[1] + r.prod_times[i]};//{beat, bar} config. OK?
+            production[i].time = {0, r.leftmost_time[1] + r.prod_times[i]};//{beat, bar} config. OK?
         }
         else {
             
@@ -569,9 +571,9 @@ void G_parser::update_cycle(vector<elem_ID>& production, rule& r, vector<int>& s
     }
     
     //at end of cycle (after last rewrite) place "S" at start.
-    start_cycle(seq_t);
+    //start_cycle(seq_t); //HERE or in blues.update()
     
-    update_ending(seq_t);//will overwrite start_cycle()
+    //update_ending(seq_t);//will overwrite start_cycle()
     
     //debug
     cout << "new cycle (update_cycle()): ";

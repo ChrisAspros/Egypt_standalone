@@ -15,7 +15,7 @@ G_parser::G_parser() : grammar(grammar_path, std::ifstream::in){
     //grammar_path = "/Users/christodoulosaspromallis/Desktop/UCL/PhD Year 2/Development/OF/of_v0.9.1_osx_release/apps/midiWorkspace/blues/parser_project/bin/data/blues_grammar.txt";
     //cout << "CONTRUCTOR" << endl;
     
-    grammar_path = "/Users/christodoulosaspromallis/Documents/UCL/PhD_Y_3/OF/of_v0.9.8_osx_release/apps/myApps/ICMC_test/Egypt_standalone/bin/data/egypt_grammar.py";
+    grammar_path = "/Users/christodoulosaspromallis/Documents/UCL/PhD_Y_3/OF/of_v0.9.8_osx_release/apps/myApps/ICMC_test/Egypt_standalone/bin/data/egypt_grammar_functions.py";
     
     //ifstream grammar(grammar_path, ifstream::in);
     grammar.open(grammar_path);
@@ -58,7 +58,7 @@ G_parser::G_parser() : grammar(grammar_path, std::ifstream::in){
     
     //place decs for the 1st cycle
     vector<int> t_aux = {0, 0, 0, form_length-1, 0};
-    update_dec(t_aux);
+    start_cycle(t_aux);
     
     grammar.close();
     
@@ -72,13 +72,13 @@ void G_parser::store_rules(string& nc){
         //cout << "rules: entered and harn_rh==" << harm_rh << " and form_length==" << form_length << endl;
         all_rules.push_back(rule());
         all_rules[rule_pop].is_optional = false;
+        all_rules[rule_pop].timed_production = false;
         
         nc = get_nc();
         
         //left side
         while(nc!="->"){
             all_rules[rule_pop].left_str.push_back(nc);
-            store_opt_data(nc);
             nc = get_nc();
         }
         
@@ -91,9 +91,16 @@ void G_parser::store_rules(string& nc){
             all_rules[rule_pop].right_side[prod_pop].prob = atof(nc.c_str());
             nc = get_nc();
             
+            //nc = get_nc();////NECESSARY??
+            
             //store right_str
             while(nc!="->" && nc!=":end_rule"){
                 all_rules[rule_pop].right_side[prod_pop].right_str.push_back(nc);//={"STR1", "STR2"};//
+                //nc = get_nc();
+                
+                store_opt_data(nc);
+                store_prod_times(nc, all_rules[rule_pop]);
+                
                 nc = get_nc();
             }
             
@@ -138,13 +145,14 @@ void G_parser::store_rules(string& nc){
                     
                     all_rules[rule_pop].leftmost_time =  {rule_time[0], rule_time[1] - (i / harm_rh)};
                     
-                    //exclude "_*.."
-                    all_rules[rule_pop].left_str[i] = exclude_time(all_rules[rule_pop].left_str[i]);
+                    //exclude "_*..", i.e. stores "I" in rule instead of "I_2" (plus time info of course)
+                    all_rules[rule_pop].left_str[i] = exclude_times(all_rules[rule_pop].left_str[i]);
                     
                     //existing_rules.push_back();
                     break;
                     
-                } else all_rules[rule_pop].leftmost_time = {0, 0};
+                }
+                else all_rules[rule_pop].leftmost_time = {0, 0};
                 
             }
             
@@ -154,6 +162,7 @@ void G_parser::store_rules(string& nc){
         
         all_rules[rule_pop].timed = is_timed;
         
+        //storing timed_rules/general_rules separately
         if (is_timed) {
             //cout << "rule_time: " << rule_time[0] << " " << rule_time[1] << endl;
             existing_times.push_back(rule_time);//to test existence of rule_time, ELSE general_rules
@@ -214,18 +223,42 @@ void G_parser::store_options(string& nc){
 }
 
 
-string G_parser::exclude_time(string& s_t_r){
+void G_parser::store_prod_times(string& nc, rule& r){
+    
+    for(int i=0; i<nc.length(); i++){
+        
+        if (nc[i]=='('){
+            r.timed_production = true;
+            
+            //store production times
+            string prod_t_str;
+            i++;
+            while (nc[i]!=')'){
+                
+                prod_t_str.push_back(nc[i]);
+                i++;
+            }
+            int prod_t_int = atoi(prod_t_str.c_str()) - 1;
+            r.prod_times.push_back(prod_t_int);
+            
+            //exclude '(*)'
+            //exclude_times(nc)//need to store the ELEM (or smth) in r.right_str?
+        }
+    }
+}
+
+
+string G_parser::exclude_times(string& s_t_r){//excludes '(8)' or '_*'
     
     string new_str;
     for(int i=0; i<s_t_r.length(); i++){
         
-        if (s_t_r[i] == '_') break;
+        if (s_t_r[i] == '_' || s_t_r[i] == '(') break;
         new_str.push_back(s_t_r[i]);
     }
     
     return new_str;
 }
-
 
 
 void G_parser::find_rule(vector<int>& seq_t){
@@ -255,7 +288,7 @@ void G_parser::find_rule(vector<int>& seq_t){
             
             //cout << "reached 3" << endl;
             //check context (match rule with current context)
-            for (int j=0; j<timed_rules[{seq_t[2], seq_t[3]}].size(); j++){
+            for (int j=0; j<timed_rules[{seq_t[2], seq_t[3]}].size(); j++){//in case more than 1 rule for seq_t?
                 
                 //cout << "reached 4" << endl;
                 //check_context(seq_t);
@@ -463,16 +496,24 @@ void G_parser::rewrite(rule& r, vector<int>& seq_t){
     //produce from rule
     for (int i=0; i<r.right_side[choice].right_str.size(); i++){
         
-        production.push_back(elem_ID());
-        production[i].name = r.right_side[choice].right_str[i];
-        //else (generals.leftmost_time == {0 ,0})
-        
-        vector<int> t_aux(2);
-        
-        t_aux[0] = r.leftmost_time[0] % t_sign;
+        vector<int> t_aux(2);//beat, bar
+        t_aux[0] = r.leftmost_time[0] % t_sign;//time signature
         t_aux[1] = ((r.leftmost_time[1]+i / harm_rh) + form_length) % form_length;
         
-        production[i].time = t_aux;
+        production.push_back(elem_ID());
+        
+        if (r.timed_production){
+            
+            production[i].name = exclude_times(r.right_side[choice].right_str[i]);
+            production[i].time = {0, r.leftmost_time[1] + r.prod_times[i]};//{beat, bar} config. OK?
+        }
+        else {
+            
+            production[i].name = r.right_side[choice].right_str[i];
+            //else (generals.leftmost_time == {0 ,0})
+            
+            production[i].time = t_aux;
+        }
     }
     
     update_cycle(production, r, seq_t);
@@ -486,7 +527,7 @@ void G_parser::rewrite(rule& r, vector<int>& seq_t){
      */
 }
 
-
+//choosing re-write based on rule probability
 int G_parser::rewrite_choice(rule& r){
     
     int _choice;
@@ -523,16 +564,16 @@ void G_parser::update_cycle(vector<elem_ID>& production, rule& r, vector<int>& s
     
     for(int i=0; i<production.size(); i++){
         
-        //if optional element, don't update that!!
+        //if optional element, don't update that (in curr_cycle)!!
         vector<int>::iterator it = find(r.opt_positions.begin(), r.opt_positions.end(), i);
-        if (it==r.opt_positions.end()) curr_cycle[production[i].time[1]] = production[i];//harm_rh-dependent placement..??
-        
+        if (it==r.opt_positions.end()) curr_cycle[production[i].time[1]] = production[i];//placing production in cycle
+        //i.e. if i does not exist in the r.opt_positions vector
     }
     
-    //at end of cycle (after last rewrite) place dec (or dec_* ??) at decision points
-    update_dec(seq_t);
+    //at end of cycle (after last rewrite) place "S" at start.
+    //start_cycle(seq_t); //HERE or in blues.update()
     
-    update_ending(seq_t);//will overwrite update_dec()
+    //update_ending(seq_t);//will overwrite start_cycle()
     
     //debug
     cout << "new cycle (update_cycle()): ";
@@ -541,11 +582,12 @@ void G_parser::update_cycle(vector<elem_ID>& production, rule& r, vector<int>& s
 }
 
 
-void G_parser::update_dec(vector<int>& seq_t){
+void G_parser::start_cycle(vector<int>& seq_t){
     
     if (seq_t[3] == form_length / harm_rh - 1 && !ending && is_terminal(seq_t)){
         
-        for (int i=0; i<dec_bars.size(); i++) curr_cycle[dec_bars[i]].name = "dec";
+        curr_cycle[0].name = "S";
+        //for (int i=0; i<dec_bars.size(); i++) curr_cycle[dec_bars[i]].name = "Sect";
     }
 }
 
@@ -791,7 +833,7 @@ void G_parser::get_basic_vectors(string& nc){//perhaps get all namespace and cat
                     dec_bars.push_back(curr_bar);
                 }
                 else if (v_name=="cadence_bars"){
-                    int curr_bar = atoi(nc.c_str()) - 1;//only if nc=="decision_bars"
+                    int curr_bar = atoi(nc.c_str()) - 1;
                     cad_bars.push_back(curr_bar);
                 }
                 else basic_vector[v_name].push_back(nc);

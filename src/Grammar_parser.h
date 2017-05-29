@@ -22,7 +22,7 @@ public:
     G_parser();// : grammar(grammar_path, std::ifstream::in){}
     //~G_parser();
     
-    string grammar_path;// = "/Users/christodoulosaspromallis/Documents/UCL/PhD_Y_3/OF/of_v0.9.8_osx_release/apps/myApps/ICMC_test/from_SMC/bin/data/blues_grammar.txt";
+    string grammar_path;
     ifstream grammar;
     
     string nc, c;
@@ -47,21 +47,19 @@ public:
     int rule_pop = 0;
     //int leftmost_time;
     
-    int aux = 0;
-    
-    void store_opt_data(string& nc);
-    void store_options(string& nc);
-    
     struct right_s{
         vector<string> right_str;
         float prob;
     };
+    
     struct rule{
         vector<string> left_str;
         vector<right_s> right_side;
         vector<int> leftmost_time;//{beat, bar}
         
-        bool timed;
+        bool timed;//re: left side of rule "dec_1"
+        bool timed_production;//re: right side of rule "SectA(9)"
+        vector<int> prod_times;//production times of right elements (if timed)
         
         //optional elements
         bool is_optional;
@@ -74,18 +72,17 @@ public:
     map<vector<int>, vector<rule>> timed_rules;//specified rule: labels timed rules (t vector)
     vector<rule> general_rules;//store non-timed rules
     
-    string exclude_time(string& s_t_r);
+    void store_opt_data(string& nc);
+    void store_options(string& nc);
+    void store_prod_times(string& nc, rule& r);
+    
+    string exclude_times(string& s_t_r);
     
     void print_rules();
     
     struct elem_ID{
         string name;
         vector<int> time;//beat, bar (harm_rh next)
-    };
-    
-    struct type_ID{
-        string name;
-        vector<int> time;//corrsponding time in music form
     };
     
     void find_rule(vector<int>& seq_t);
@@ -104,7 +101,7 @@ public:
     
     vector<elem_ID> curr_cycle;
     void update_cycle(vector<elem_ID>& production, rule& r, vector<int>& seq_t);//size() = [form_length * harmonic_rhythm]
-    void update_dec(vector<int>& seq_t);
+    void start_cycle(vector<int>& seq_t);
     void update_ending(vector<int>& seq_t);
     void update_cad(vector<int>& seq_t);
     void recover(vector<int>& seq_t);

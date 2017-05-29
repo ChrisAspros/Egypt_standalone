@@ -76,6 +76,8 @@ void Blues_structure::update(){
         parser.find_rule(t);
         string terminal = parser.return_terminal(t);
         chord = terminal_to_midi(terminal);
+        
+        parser.start_cycle(t);//HERE or in parser.update_cycle();
     }
     
     /*
@@ -93,7 +95,7 @@ void Blues_structure::update(){
     }
     else
     */
-    if (parser.stop_seq){//finishing && goal_reached && last_chord){
+    if (parser.stop_seq){//finishing && goal_reached && last_chord)
     
         stopping = true;
         if (fin_t.size()==0) fin_t = t;//keeping constant value
@@ -399,7 +401,7 @@ void Blues_structure::play_bass(vector<int>& chord){
     if (chord.size()==4) bass_patt = {0, 1, 2, 1, 3, 2, 1, 2};
     else if (chord.size()==3) bass_patt = {0, 1, 2, 1, 0, 2, 1, 2};
         
-    if (seq.only_on("semiq", t) && (seq.only_on("beat", t) || t[1]==QN_dur-1)){
+    if (seq.only_on("beat", t)){
         
         b_note = {chord[bass_patt[t[2]*2]]};
         pos_bass = {0, 0, t[2], t[3]};
@@ -447,7 +449,9 @@ void Blues_structure::play_chords(vector<int>& chord){
 
 vector<int> Blues_structure::terminal_to_midi(string& terminal){
     
-    int root_pitch = chord_translation[terminal][0];
+    int oct_off = 1; //octave offset in chord_translation
+    
+    int root_pitch = chord_translation[terminal][0] + oct_off * 12;
     //cout << "root_pitch: " << root_pitch << endl;
     int type = chord_translation[terminal][1];
     //cout << "type: " << type << endl;
@@ -459,6 +463,8 @@ vector<int> Blues_structure::terminal_to_midi(string& terminal){
 map<string, vector<int>> Blues_structure::chord_translation{//no static here
 
     {"i", {48, 0}},
+    {"im", {48, 1}},
+    {"immaj", {48, 8}},
     {"i6", {48, 3}},
     {"i7", {48, 6}},
     {"bii", {49, 0}},
@@ -490,6 +496,7 @@ vector<int> Blues_structure::get_chord(int root_pitch, int type, int invert, boo
     else if (type == 5) chord_set = {0, 3, 7, 9};
     else if (type == 6) chord_set = {0, 4, 7, 10};
     else if (type == 7) chord_set = {0, 3, 6};//chord_set.resize()?
+    else if (type == 8) chord_set = {0, 3, 7, 11};
     //else if (more chord types)
     
     /*

@@ -88,6 +88,8 @@ public:
     vector<int> pos_drums;
     vector<int> multiple_bars;
     
+    //int oct_off; //octave offset in chord_translation
+    //oct_off = -1;
     map<string, vector<int>> static chord_translation;
     //{rootpitch, type}
     

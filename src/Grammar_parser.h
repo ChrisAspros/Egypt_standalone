@@ -22,7 +22,7 @@ public:
     G_parser();// : grammar(grammar_path, std::ifstream::in){}
     //~G_parser();
     
-    string grammar_path;// = "/Users/christodoulosaspromallis/Documents/UCL/PhD_Y_3/OF/of_v0.9.8_osx_release/apps/myApps/ICMC_test/from_SMC/bin/data/blues_grammar.txt";
+    string grammar_path;
     ifstream grammar;
     
     string nc, c;

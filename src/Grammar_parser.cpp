@@ -238,7 +238,7 @@ void G_parser::store_prod_times(string& nc, rule& r){
                 prod_t_str.push_back(nc[i]);
                 i++;
             }
-            int prod_t_int = atoi(prod_t_str.c_str());
+            int prod_t_int = atoi(prod_t_str.c_str()) - 1;
             r.prod_times.push_back(prod_t_int);
             
             //exclude '(*)'
